@@ -10,6 +10,11 @@ namespace Webshop.Data
 {
     public class WebshopContext:DbContext
     {
+
+        public WebshopContext(DbContextOptions<WebshopContext> options):base(options)
+        {
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Login> Logins { get; set; }
@@ -21,9 +26,8 @@ namespace Webshop.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = ProjectWebshop");
+            //optionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = ProjectWebshop");
             //base.OnConfiguring(optionsBuilder);
-            
         }
     }
 }
