@@ -25,14 +25,14 @@ namespace Webshop.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
-            return await _context.Customers.ToListAsync();
+            return await _context.Customers.Include(c => c.Login).ThenInclude(l => l.Role).ToListAsync();
         }
 
         // GET: api/Customer/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _context.Customers.Include(c => c.Login).ThenInclude(l => l.Role).FirstOrDefaultAsync(c=> c.Id == id);
 
             if (customer == null)
             {
@@ -80,6 +80,11 @@ namespace Webshop.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
+            if(customer.Login.Id < 1)
+            {
+                customer.Login.Password = BCrypt.Net.BCrypt.HashPassword(customer.Login.Password);
+            }
+
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
 

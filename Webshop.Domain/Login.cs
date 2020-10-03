@@ -8,7 +8,11 @@ namespace Webshop.Domain
     {
         public int Id { get; set; }
         public string Email { get; set; }
-        public string HashedPassword { get; set; }
+        public string Password { get; set; }
         public Role Role { get; set; }
+
+        // needed to create login without creating a new role
+        // just pass in the roleId and everything is fine
+        public int RoleId { get; set; }
     }
 }
