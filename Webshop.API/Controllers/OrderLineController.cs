@@ -21,12 +21,13 @@ namespace Webshop.API.Controllers
             _context = context;
         }
 
-        // GET: api/OrderLine
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderLine>>> GetOrderLines()
-        {
-            return await _context.OrderLines.ToListAsync();
-        }
+        // no scenario where all orderlines should be requested
+        //// GET: api/OrderLine
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<OrderLine>>> GetOrderLines()
+        //{
+        //    return await _context.OrderLines.ToListAsync();
+        //}
 
         // GET: api/OrderLine/5
         [HttpGet("{id}")]
