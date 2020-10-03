@@ -10,8 +10,8 @@ using Webshop.Data;
 namespace Webshop.Data.Migrations
 {
     [DbContext(typeof(WebshopContext))]
-    [Migration("20201003101202_Initial")]
-    partial class Initial
+    [Migration("20201003114512_fresh-init")]
+    partial class freshinit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -49,7 +49,7 @@ namespace Webshop.Data.Migrations
                     b.Property<int>("CityZip")
                         .HasColumnType("int");
 
-                    b.Property<int?>("LoginId")
+                    b.Property<int>("LoginId")
                         .HasColumnType("int");
 
                     b.Property<string>("RealName")
@@ -78,10 +78,10 @@ namespace Webshop.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HashedPassword")
+                    b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RoleId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -98,13 +98,13 @@ namespace Webshop.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("CustomerId")
+                    b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("OrderStatusId")
+                    b.Property<int>("OrderStatusId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -126,13 +126,13 @@ namespace Webshop.Data.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrderId")
+                    b.Property<int>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("ProductId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -210,36 +210,48 @@ namespace Webshop.Data.Migrations
                 {
                     b.HasOne("Webshop.Domain.Login", "Login")
                         .WithMany()
-                        .HasForeignKey("LoginId");
+                        .HasForeignKey("LoginId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Webshop.Domain.Login", b =>
                 {
                     b.HasOne("Webshop.Domain.Role", "Role")
                         .WithMany()
-                        .HasForeignKey("RoleId");
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Webshop.Domain.Order", b =>
                 {
                     b.HasOne("Webshop.Domain.Customer", "Customer")
                         .WithMany()
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Webshop.Domain.OrderStatus", "OrderStatus")
                         .WithMany()
-                        .HasForeignKey("OrderStatusId");
+                        .HasForeignKey("OrderStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Webshop.Domain.OrderLine", b =>
                 {
                     b.HasOne("Webshop.Domain.Order", "Order")
                         .WithMany("OrderLines")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Webshop.Domain.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Webshop.Domain.Product", b =>

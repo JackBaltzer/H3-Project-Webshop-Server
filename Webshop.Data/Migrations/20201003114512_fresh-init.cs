@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Webshop.Data.Migrations
 {
-    public partial class Initial : Migration
+    public partial class freshinit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -55,9 +55,9 @@ namespace Webshop.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: true),
                     Price = table.Column<decimal>(nullable: false),
-                    CategoryId = table.Column<int>(nullable: false),
                     Description = table.Column<string>(nullable: true),
-                    Stock = table.Column<int>(nullable: false)
+                    Stock = table.Column<int>(nullable: false),
+                    CategoryId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -77,8 +77,8 @@ namespace Webshop.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Email = table.Column<string>(nullable: true),
-                    HashedPassword = table.Column<string>(nullable: true),
-                    RoleId = table.Column<int>(nullable: true)
+                    Password = table.Column<string>(nullable: true),
+                    RoleId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,7 +88,7 @@ namespace Webshop.Data.Migrations
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -102,7 +102,7 @@ namespace Webshop.Data.Migrations
                     StreetNumber = table.Column<string>(nullable: true),
                     CityZip = table.Column<int>(nullable: false),
                     CityName = table.Column<string>(nullable: true),
-                    LoginId = table.Column<int>(nullable: true)
+                    LoginId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -112,7 +112,7 @@ namespace Webshop.Data.Migrations
                         column: x => x.LoginId,
                         principalTable: "Logins",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -122,8 +122,8 @@ namespace Webshop.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OrderDate = table.Column<DateTime>(nullable: false),
-                    CustomerId = table.Column<int>(nullable: true),
-                    OrderStatusId = table.Column<int>(nullable: true)
+                    CustomerId = table.Column<int>(nullable: false),
+                    OrderStatusId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -133,13 +133,13 @@ namespace Webshop.Data.Migrations
                         column: x => x.CustomerId,
                         principalTable: "Customers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Orders_OrderStatuses_OrderStatusId",
                         column: x => x.OrderStatusId,
                         principalTable: "OrderStatuses",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -148,10 +148,10 @@ namespace Webshop.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderId = table.Column<int>(nullable: true),
-                    ProductId = table.Column<int>(nullable: true),
                     Price = table.Column<decimal>(nullable: false),
-                    Amount = table.Column<int>(nullable: false)
+                    Amount = table.Column<int>(nullable: false),
+                    OrderId = table.Column<int>(nullable: false),
+                    ProductId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -161,13 +161,13 @@ namespace Webshop.Data.Migrations
                         column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OrderLines_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

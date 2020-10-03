@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Webshop.Data;
 using Webshop.Domain;
+using BC = BCrypt.Net.BCrypt;
 
 namespace Webshop.API.Controllers
 {
@@ -25,14 +26,14 @@ namespace Webshop.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Login>>> GetLogins()
         {
-            return await _context.Logins.ToListAsync();
+            return await _context.Logins.Include(l => l.Role).ToListAsync();
         }
 
         // GET: api/Login/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Login>> GetLogin(int id)
         {
-            var login = await _context.Logins.FindAsync(id);
+            var login = await _context.Logins.Include(l => l.Role).FirstOrDefaultAsync(l => l.Id == id);
 
             if (login == null)
             {
@@ -54,6 +55,12 @@ namespace Webshop.API.Controllers
             }
 
             _context.Entry(login).State = EntityState.Modified;
+
+
+            if(login.Password != null)
+            {
+                login.Password = BC.HashPassword(login.Password);
+            }
 
             try
             {
@@ -80,6 +87,9 @@ namespace Webshop.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Login>> PostLogin(Login login)
         {
+
+            login.Password = BC.HashPassword(login.Password);
+
             _context.Logins.Add(login);
             await _context.SaveChangesAsync();
 

@@ -14,5 +14,9 @@ namespace Webshop.Domain
         public string CityName { get; set; }
         public Login Login { get; set; }
 
+        // needed to create customer without creating a new login
+        // just pass in the loginId and everything is fine
+        public int LoginId { get; set; }
+
     }
 }
