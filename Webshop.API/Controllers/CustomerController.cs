@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 using Webshop.Data;
 using Webshop.Domain;
 
@@ -25,6 +26,7 @@ namespace Webshop.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
+            // include both login and roles when fetching customers
             return await _context.Customers.Include(c => c.Login).ThenInclude(l => l.Role).ToListAsync();
         }
 
@@ -32,6 +34,7 @@ namespace Webshop.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
+            // include both login and roles when fetching a customer
             var customer = await _context.Customers.Include(c => c.Login).ThenInclude(l => l.Role).FirstOrDefaultAsync(c=> c.Id == id);
 
             if (customer == null)
@@ -80,7 +83,14 @@ namespace Webshop.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
-            if(customer.Login.Id < 1)
+            // confirm a login is present when creating a new customer
+            // either a new Login object, or an Id to an existing one
+            if(customer.Login == null && customer.LoginId < 1)
+            {
+                return BadRequest();
+            }
+
+            if(customer.Login != null && customer.Login.Password != "")
             {
                 customer.Login.Password = BCrypt.Net.BCrypt.HashPassword(customer.Login.Password);
             }
