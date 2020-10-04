@@ -8,10 +8,10 @@ using Webshop.Domain;
 
 namespace Webshop.Data
 {
-    public class WebshopContext:DbContext
+    public class WebshopContext : DbContext
     {
-
-        public WebshopContext(DbContextOptions<WebshopContext> options):base(options)
+        public WebshopContext() { }
+        public WebshopContext(DbContextOptions<WebshopContext> options) : base(options)
         {
             ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
@@ -24,9 +24,10 @@ namespace Webshop.Data
         public DbSet<OrderStatus> OrderStatuses { get; set; }
         public DbSet<OrderLine> OrderLines { get; set; }
 
+        public DbSet<User> Users { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = ProjectWebshop");
+            optionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = ProjectWebshop");
             //base.OnConfiguring(optionsBuilder);
         }
     }
