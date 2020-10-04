@@ -5,10 +5,12 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Webshop.API.Models;
+using Webshop.API.Services;
 using Webshop.Data;
 using Webshop.Domain;
 using BC = BCrypt.Net.BCrypt;
@@ -20,11 +22,13 @@ namespace Webshop.API.Controllers
     public class LoginController : ControllerBase
     {
         private readonly WebshopContext _context;
-        private string _tokenKey = "LndeQioTxzvR65FaEfXr0qm9m4H822jhAN4sl8z6cZhUkkawgt371MopObySI37u";
+        private readonly string _tokenKey = "LndeQioTxzvR65FaEfXr0qm9m4H822jhAN4sl8z6cZhUkkawgt371MopObySI37u";
+        private readonly IUserService _userService;
 
-        public LoginController(WebshopContext context)
+        public LoginController(WebshopContext context, IUserService userService) 
         {
             _context = context;
+            _userService = userService;
         }
 
         // GET: api/Login
@@ -36,6 +40,7 @@ namespace Webshop.API.Controllers
         }
 
         // GET: api/Login/5
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Login>> GetLogin(int id)
         {
@@ -53,6 +58,7 @@ namespace Webshop.API.Controllers
         // PUT: api/Login/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLogin(int id, Login login)
         {
@@ -97,6 +103,7 @@ namespace Webshop.API.Controllers
         // POST: api/Login
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Login>> PostLogin(Login login)
         {
@@ -116,6 +123,7 @@ namespace Webshop.API.Controllers
         }
 
         // DELETE: api/Login/5
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Login>> DeleteLogin(int id)
         {
@@ -131,38 +139,28 @@ namespace Webshop.API.Controllers
             return login;
         }
 
-
-        [HttpPost("Authenticate")]
-        public IActionResult Authenticate([FromBody] Login login)
-        {
-            var user = _context.Logins.Include(l => l.Role).FirstOrDefault(u => u.Email == login.Email);
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-            else
-            {
-                if (!BC.Verify(login.Password, user.Password))
-                {
-                    return Unauthorized();
-                }
-                else
-                {
-                    var token = GenerateJwtToken(user);
-                    if (token == null)
-                    {
-                        return Unauthorized();
-                    }
-                    return Ok(token);
-                }
-            }
-        }
-
-
         private bool LoginExists(int id)
         {
             return _context.Logins.Any(e => e.Id == id);
         }
+
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate([FromBody] AuthenticateRequest model)
+        {
+
+
+            var response = _userService.Authenticate(model, ipAddress());
+
+            if (response == null)
+                return BadRequest(new { message = "Username or password is incorrect" });
+
+           // setTokenCookie(response.RefreshToken);
+
+            return Ok(response);
+        }
+
+
 
         // Token generation happens during login 
         public string GenerateJwtToken(Login login)
@@ -181,6 +179,7 @@ namespace Webshop.API.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
         public int? ValidateJwtToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -208,6 +207,14 @@ namespace Webshop.API.Controllers
                 // return null if validation fails
                 return null;
             }
+        }
+
+        private string ipAddress()
+        {
+            if (Request.Headers.ContainsKey("X-Forwarded-For"))
+                return Request.Headers["X-Forwarded-For"];
+            else
+                return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
         }
     }
 }

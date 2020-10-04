@@ -10,8 +10,8 @@ using Webshop.Data;
 namespace Webshop.Data.Migrations
 {
     [DbContext(typeof(WebshopContext))]
-    [Migration("20201003114512_fresh-init")]
-    partial class freshinit
+    [Migration("20201004104450_jwt")]
+    partial class jwt
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -206,6 +206,30 @@ namespace Webshop.Data.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("Webshop.Domain.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("Webshop.Domain.Customer", b =>
                 {
                     b.HasOne("Webshop.Domain.Login", "Login")
@@ -261,6 +285,50 @@ namespace Webshop.Data.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Webshop.Domain.User", b =>
+                {
+                    b.OwnsMany("Webshop.Domain.RefreshToken", "RefreshTokens", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<DateTime>("Created")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("CreatedByIp")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<DateTime>("Expires")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("ReplacedByToken")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<DateTime?>("Revoked")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("RevokedByIp")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Token")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("UserId")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("UserId");
+
+                            b1.ToTable("RefreshToken");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
                 });
 #pragma warning restore 612, 618
         }
