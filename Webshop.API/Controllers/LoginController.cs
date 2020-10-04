@@ -103,7 +103,7 @@ namespace Webshop.API.Controllers
         // POST: api/Login
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Login>> PostLogin(Login login)
         {
@@ -171,7 +171,8 @@ namespace Webshop.API.Controllers
             {
                 Subject = new ClaimsIdentity(new[] { 
                     new Claim("id", login.Id.ToString()),
-                    new Claim("roleAccess", login.Role.RoleAccess.ToString())
+                    new Claim("roleAccess", login.Role.RoleAccess.ToString()),
+                    new Claim("role", login.Role.Name)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
